@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -euo pipefail
+
+echo "Starting Kafka cluster..."
+docker-compose -f docker-compose.yml up -d
+
+echo "Sleeping 1 minute to wait for Kafka cluster to be up..."
+sleep 60
+
+echo "Creating clickstream_raw topic..."
+/Users/victor/Downloads/from_desktop/drc-demo/confluent-5.3.0/bin/kafka-topics --zookeeper localhost:2181 --create --topic clickstream_raw --replication-factor 1 --partitions 1 --config retention.ms=172800000
+
+echo "Starting UDP to Kafka Bridge"
+nohup java -Dbind.host=0.0.0.0 -Dbind.port=10514 -Dtopic=clickstream_raw -Dkafka.metadata.broker.list=localhost:9092 -Dkafka.serializer.class=kafka.serializer.StringEncoder -Dkafka.compression.codec=1 -Dkafka.producer.type=async -jar kafka-bridge/udp-kafka-bridge-assembly-0.1.jar > bridge.out 2> bridge.err &
+
+echo "Starting Data Producer"
+nohup java -jar data-producer/udpclient-1.0-SNAPSHOT-jar-with-dependencies.jar data-producer/config.properties > producer.out 2> producer.err &
