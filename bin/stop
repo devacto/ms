@@ -2,4 +2,31 @@
 
 set -euo pipefail
 
+echo 'Stopping data producer...'
+PRODPIDS=$(ps aux | grep '[u]dpclient-1.0-SNAPSHOT-jar-with-dependencies.jar' | awk '{print $2}')
+
+if [ -z "$PRODPIDS" ]; then
+  echo "No CLI session(s) to stop"
+  exit 0
+fi
+
+for PID in $PRODPIDS; do
+  kill -s TERM "$PID"
+  while kill -0 "$PID" >/dev/null 2>&1; do sleep 1; done
+done
+
+echo 'Stopping Kafka bridge...'
+BRIPIDS=$(ps aux | grep '[u]dp-kafka-bridge' | awk '{print $2}')
+
+if [ -z "$BRIPIDS" ]; then
+  echo "No CLI session(s) to stop"
+  exit 0
+fi
+
+for PID in $BRIPIDS; do
+  kill -s TERM "$PID"
+  while kill -0 "$PID" >/dev/null 2>&1; do sleep 1; done
+done
+
+echo 'Stopping Kafka cluster...'
 docker-compose -f docker-compose.yml stop
