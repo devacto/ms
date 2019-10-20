@@ -29,4 +29,49 @@ for PID in $BRIPIDS; do
 done
 
 echo 'Stopping Kafka cluster...'
-docker-compose -f docker-compose.yml stop
+docker-compose -f docker-compose.yml down
+
+file="bridge.out"
+if [ -f "$file" ]
+then
+	echo "Cleaning $file."
+  rm $file
+else
+	echo "$file not found."
+fi
+
+file="bridge.err"
+if [ -f "$file" ]
+then
+	echo "Cleaning $file."
+  rm $file
+else
+	echo "$file not found."
+fi
+
+file="producer.err"
+if [ -f "$file" ]
+then
+	echo "Cleaning $file."
+  rm $file
+else
+	echo "$file not found."
+fi
+
+file="producer.out"
+if [ -f "$file" ]
+then
+	echo "Cleaning $file."
+  rm $file
+else
+	echo "$file not found."
+fi
+
+file="logs/udp-kafka-bridge.log"
+if [ -f "$file" ]
+then
+	echo "Cleaning $file."
+  rm $file
+else
+	echo "$file not found."
+fi

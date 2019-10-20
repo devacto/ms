@@ -4,3 +4,4 @@ bridge.err
 producer.out
 producer.err
 *.log
+*.log.gz
