@@ -5,7 +5,7 @@ set -euo pipefail
 export CONFLUENT_HOME=/Users/victor/Downloads/from_desktop/drc-demo/confluent-5.3.0
 
 echo "Starting Kafka cluster..."
-docker-compose -f docker-compose.yml up -d
+docker-compose -f docker-compose.yml up -d --build
 
 echo "Sleeping 1 minute to wait for Kafka cluster to be up..."
 sleep 60
