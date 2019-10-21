@@ -10,6 +10,8 @@ Most parts of the data architecture is implemented in this repository. Shell scr
 
 JSON data is being pumped into Kafka using a data producer which I developed and can be found [here](https://github.com/devacto/udp-data-producer).
 
+Configuration for this data producer can be found [here](https://github.com/devacto/ms/blob/master/data-producer/config.properties).
+
 ### Clickstream Data in Kafka
 
 As shown in the screenshot below, Clickstream data enters Kafka in real-time.
@@ -33,6 +35,8 @@ Clickstream data from Kafka is being pushed to Cassandra in real-time using Kafk
 Configuration for this Kafka Connect component can be found [here](https://github.com/devacto/ms/blob/master/cassandra-sink/config.json). And shown in the screenshot below.
 
 ![connect_cassandra_sink_config](https://raw.githubusercontent.com/devacto/ms/master/docs/images/connect_cassandra_sink_config.png)
+
+Configuration for Cassandra is [here](https://github.com/devacto/ms/blob/master/cqlsh/clickstream-schema.cql).
 
 ### Real-Time Monitoring of Data in Kafka
 
