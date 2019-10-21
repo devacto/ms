@@ -1,0 +1,2 @@
+create keyspace if not exists ms with replication = {'class': 'SimpleStrategy', 'replication_factor':1};
+create table if not exists ms.clickstream_avro (session_id text, user_id text, partner_name text, page_type text, init_session text, date bigint, user_agent text, city text, current_url text, referrer text, language text, PRIMARY KEY(user_id, date));

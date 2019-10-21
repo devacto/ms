@@ -70,7 +70,7 @@ services:
       CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
       CONNECT_REST_ADVERTISED_HOST_NAME: "kafka-connect"
       CONNECT_LOG4J_ROOT_LOGLEVEL: "INFO"
-      CONNECT_LOG4J_LOGGERS: "org.apache.kafka.connect.runtime.rest=WARN,org.reflections=ERROR"
+      CONNECT_LOG4J_LOGGERS: "org.apache.kafka.connect.runtime.rest=DEBUG,org.reflections=ERROR"
       CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "1"
       CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "1"
       CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "1"
@@ -79,6 +79,7 @@ services:
       CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-5.3.1.jar
       CONNECT_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
       CONNECT_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
+      KAFKA_PRODUCER_BATCH_SIZE: 10
     command: "bash -c 'if [ ! -d /usr/share/confluent-hub-components/confluentinc-kafka-connect-cassandra ]; then echo \"WARNING: Did not find directory for kafka-connect-cassandra (did you remember to run: docker-compose up -d --build ?)\"; fi ; /etc/confluent/docker/run'"
 
   ksql-server:
@@ -94,24 +95,6 @@ services:
       KSQL_BOOTSTRAP_SERVERS: kafka:29092
       KSQL_LISTENERS: http://0.0.0.0:8088
       KSQL_KSQL_SCHEMA_REGISTRY_URL: http://schema-registry:8081
-
-  # ksql-cli:
-  #   container_name: ksql-cli
-  #   image: confluentinc/cp-ksql-cli:5.3.1
-  #   depends_on:
-  #     - ksql-server
-  #   entrypoint: /bin/sh
-  #   tty: true
-  #   volumes:
-  #     - $PWD/ksql/ksql-clickstream-demo/demo:/usr/share/doc/clickstream
-
-  # kafkacat:
-  #   container_name: kafkacat
-  #   image: confluentinc/cp-kafkacat:latest
-  #   depends_on:
-  #     - kafka
-  #   entrypoint: /bin/sh
-  #   tty: true
 
   control-center:
     container_name: control-center
@@ -139,72 +122,23 @@ services:
       CONTROL_CENTER_CUB_KAFKA_TIMEOUT: 300
       PORT: 9021
 
-  # Runs the Kafka KSQL data generator
-  # datagen:
-  #   container_name: datagen
-  #   # Downrev ksql-examples to 5.1.2 due to DEVX-798 (work around issues in 5.2.0)
-  #   image: confluentinc/ksql-examples:5.3.1
-  #   depends_on:
-  #     - kafka
-  #     - schema-registry
-  #   command: "bash -c 'echo Waiting for Kafka to be ready... && \
-  #                      cub kafka-ready -b kafka:29092 1 300 && \
-  #                      echo Waiting for Confluent Schema Registry to be ready... && \
-  #                      cub sr-ready schema-registry 8081 300 && \
-  #                      echo Waiting a few seconds for topic creation to finish... && \
-  #                      sleep 20 && \
-  #                      ksql-datagen \
-  #                         bootstrap-server=kafka:29092 \
-  #                         quickstart=clickstream_codes \
-  #                         format=json \
-  #                         topic=clickstream_codes \
-  #                         maxInterval=20 \
-  #                         iterations=100 && \
-  #                      ksql-datagen \
-  #                         bootstrap-server=kafka:29092 \
-  #                         quickstart=clickstream_users \
-  #                         format=json \
-  #                         topic=clickstream_users \
-  #                         maxInterval=10 \
-  #                         iterations=1000 && \
-  #                      ksql-datagen \
-  #                         quickstart=clickstream \
-  #                         format=json \
-  #                         topic=clickstream \
-  #                         maxInterval=100 \
-  #                         bootstrap-server=kafka:29092'"
+  cassandra:
+    container_name: cassandra
+    image: datastax/dse-server:latest
+    mem_limit: 4g
+    environment:
+      DS_LICENSE: "accept"
+    volumes:
+      - $PWD/cqlsh:/cqlsh
 
-  # elasticsearch:
-  #   container_name: elasticsearch
-  #   image: docker.elastic.co/elasticsearch/elasticsearch:6.3.0
-  #   ports:
-  #     - 9200:9200
-  #   environment:
-  #     xpack.security.enabled: "false"
-  #     ES_JAVA_OPTS: "-Xms1g -Xmx1g"
-  #     ELASTIC_HOST: elasticsearch
-  #   volumes:
-  #    - $PWD/ksql/ksql-clickstream-demo/demo:/scripts
+  studio:
+    container_name: studio
+    image: datastax/dse-studio
+    mem_limit: 1g
+    depends_on:
+      - cassandra
+    ports:
+      - "9091:9091"
+    environment:
+      DS_LICENSE: "accept"
 
-  # grafana:
-  #   container_name: grafana
-  #   image: grafana/grafana:5.2.4
-  #   ports:
-  #     - 3000:3000
-  #   environment:
-  #     GRAFANA_HOST: grafana
-  #   volumes:
-  #    - $PWD/ksql/ksql-clickstream-demo/demo:/scripts
-
-# Kibana's useful for exploring the data, and/or dev tools for
-# Elasticsearch. It's not core to the demo though, so not enabled
-# by default. 
-  # kibana:
-  #   image: docker.elastic.co/kibana/kibana:6.3.0
-  #   depends_on:
-  #     - elasticsearch
-  #   ports:
-  #     - 5601:5601
-  #   environment:
-  #     xpack.security.enabled: "false"
-  #     discovery.type: "single-node"

@@ -2,6 +2,9 @@
 
 Clickstream Data Pipeline.
 
+
+KSQL Portion is handled here: 
+
 ### To start
 
 Run `bin/start` from the terminal to start.
