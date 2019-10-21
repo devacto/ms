@@ -4,7 +4,9 @@
 
 ## Implementation Explanation
 
-Most parts of the data architecture is implemented in this repository. Shell script that shows the different parts of the architecture can be found [here](https://github.com/devacto/ms/blob/master/bin/start). 
+Most parts of the data architecture is implemented in this repository. Shell script that shows the different parts of the architecture can be found [here](https://github.com/devacto/ms/blob/master/bin/start).
+
+This repository shows all the components of the real-time processing pipeline.
 
 ### Data Producer to Kafka
 
