@@ -40,6 +40,10 @@ Configuration for this Kafka Connect component can be found [here](https://githu
 
 Configuration for Cassandra is [here](https://github.com/devacto/ms/blob/master/cqlsh/clickstream-schema.cql).
 
+Data that ends up in Cassandra can be seen in the screenshot below.
+
+![cassandra_data](https://raw.githubusercontent.com/devacto/ms/master/docs/images/cassandra_query.png)
+
 ### Real-Time Monitoring of Data in Kafka
 
 Screenshot of real-time monitoring of data in Kafka is shown below.

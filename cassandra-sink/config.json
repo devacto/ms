@@ -3,7 +3,7 @@
   "config": {
     "connector.class": "io.confluent.connect.cassandra.CassandraSinkConnector",
     "tasks.max": "1",
-    "errors.tolerance": "all",
+    "errors.tolerance": "none",
     "topics": "clickstream_avro",
     "cassandra.contact.points": "cassandra",
     "cassandra.keyspace" : "ms",
@@ -11,6 +11,9 @@
     "cassandra.consistency.level": "LOCAL_ONE",
     "cassandra.security.enabled": "false",
     "cassandra.sink.route.clickstream_avro": "ms.clickstream_avro",
-    "cassandra.write.mode": "insert"
+    "cassandra.write.mode": "insert",
+    "transforms": "ValueToKey",
+    "transforms.ValueToKey.type":"org.apache.kafka.connect.transforms.ValueToKey",
+    "transforms.ValueToKey.fields":"USER_ID"
   }
 }
